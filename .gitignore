@@ -1,0 +1,11 @@
+build/*
+prof/*
+.cache/
+*.egg*
+pyccd.egg-info/*
+pip-selfcheck.json
+*.pyc
+*__pycache__/*
+*.venv/*
+*.ipynb_checkpoints
+.idea/
