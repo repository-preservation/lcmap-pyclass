@@ -1,10 +1,11 @@
 import numpy as np
 
-from pyclass.app import logging, defaults
+from pyclass.app import logging, defaults, ensure_ndarray_input
 
 log = logging.getLogger(__name__)
 
 
+@ensure_ndarray_input
 def quality_stats(quality, clear=defaults.QA_CLEAR, water=defaults.QA_WATER,
                   snow=defaults.QA_SNOW, cloud=defaults.QA_CLOUD,
                   fill=defaults.QA_FILL):
@@ -22,13 +23,11 @@ def quality_stats(quality, clear=defaults.QA_CLEAR, water=defaults.QA_WATER,
         fill: int value representing fill/nodata
 
     Returns:
-        float: cloud probability
-        float: snow probability
-        float: water probability
+        1-d ndarray: cloud probability
+        1-d ndarray: snow probability
+        1-d ndarray: water probability
 
     """
-    # This probably should be broken apart into separate components, to reduce
-    # code complexity
     total_count = np.sum(quality != fill, axis=1)
     clear_water_count = np.sum((quality == clear) | (quality == water), axis=1)
     cloud_count = np.sum(quality == cloud, axis=1)

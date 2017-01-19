@@ -10,6 +10,9 @@ lifecycle, usually at the time of first import. This pattern is borrowed
 from Flask.
 """
 import os, logging, sys, yaml
+from functools import wraps
+
+import numpy as np
 
 
 ############################
@@ -54,3 +57,14 @@ class Defaults(dict):
 
 
 defaults = Defaults(os.path.join(os.path.dirname(__file__), 'parameters.yaml'))
+
+
+def ensure_ndarray_input(func):
+    """
+    Wrapper to ensure inputs to a method are of type ndarray
+    This cleans up subsequent code that might need to check for this
+    """
+    @wraps(func)
+    def f(*args, **kwargs):
+        return func(*(np.asarray(_) for _ in args), **kwargs)
+    return f
