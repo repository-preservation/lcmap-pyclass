@@ -1,10 +1,11 @@
 import numpy as np
 
-from pyclass.app import logging, defaults
+from pyclass.app import logging, defaults, ensure_ndarray_input
 
 log = logging.getLogger(__name__)
 
 
+@ensure_ndarray_input
 def quality_stats(quality, clear=defaults.QA_CLEAR, water=defaults.QA_WATER,
                   snow=defaults.QA_SNOW, cloud=defaults.QA_CLOUD,
                   fill=defaults.QA_FILL):
@@ -22,22 +23,16 @@ def quality_stats(quality, clear=defaults.QA_CLEAR, water=defaults.QA_WATER,
         fill: int value representing fill/nodata
 
     Returns:
-        float: cloud probability
-        float: snow probability
-        float: water probability
+        1-d ndarray: cloud probability
+        1-d ndarray: snow probability
+        1-d ndarray: water probability
 
     """
-    nofill = quality[quality != fill]
-    clear_water_vw = nofill[quality == clear | quality == water]
-    cloud_vw = nofill[quality == cloud]
-    water_vw = nofill[quality == water]
-    snow_vw = nofill[quality == snow]
-
-    total_count = np.sum(nofill, axis=1)
-    clear_water_count = np.sum(clear_water_vw, axis=1)
-    cloud_count = np.sum(cloud_vw, axis=1)
-    snow_count = np.sum(water_vw, axis=1)
-    water_count = np.sum(snow_vw, axis=1)
+    total_count = np.sum(quality != fill, axis=1)
+    clear_water_count = np.sum((quality == clear) | (quality == water), axis=1)
+    cloud_count = np.sum(quality == cloud, axis=1)
+    snow_count = np.sum(quality == snow, axis=1)
+    water_count = np.sum(quality == water, axis=1)
 
     cloud_prob = cloud_count / total_count * 100
     snow_prob = snow_count / (clear_water_count + snow_count + 0.01) * 100
