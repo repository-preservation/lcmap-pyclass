@@ -7,3 +7,13 @@ QA_WATER: 1
 QA_SHADOW: 2
 QA_SNOW: 3
 QA_CLOUD: 4
+
+############################
+# Reclassify values in the target data set used for training
+############################
+TARGET_FROM:
+  - 3
+  - 4
+TARGET_TO:
+  - 10
+  - 10
