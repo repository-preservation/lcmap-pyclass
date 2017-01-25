@@ -1,5 +1,5 @@
 ############################
-# Representative values in the QA band
+# Representative values in the QA band.
 ############################
 QA_FILL: 255
 QA_CLEAR: 0
@@ -9,7 +9,15 @@ QA_SNOW: 3
 QA_CLOUD: 4
 
 ############################
-# Reclassify values in the target data set used for training
+# Values related to training.
+############################
+RANDOM_FOREST_TREES: 500
+CLASS_MIN: 600
+CLASS_MAX: 8000
+TOTAL_SAMPLE: 20000
+
+############################
+# Reclassify values in the target data set used for training.
 ############################
 TARGET_FROM:
   - 3

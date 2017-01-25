@@ -1,3 +1,5 @@
+import numpy as np
+
 from pyclass.app import logging, defaults
 
 
@@ -20,3 +22,7 @@ def reclass_target(target, tgt_from=defaults.TARGET_FROM, tgt_to=defaults.TARGET
         target[tgt_from[i]] = tgt_to[i]
 
     return target
+
+
+def train_randomforest(x, y, random_state=None):
+    pass
