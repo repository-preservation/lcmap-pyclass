@@ -14,3 +14,21 @@ def test_reclass_target():
     res = training.reclass_target(arr, tgt_from, tgt_to)
 
     assert np.array_equal(ans, res)
+
+
+def test_class_stats():
+    arr = np.arange(5)
+    prct_ans = np.array([0.2, 0.2, 0.2, 0.2, 0.2])
+
+    vals, prct = training.class_stats(arr)
+
+    assert np.array_equal(arr, vals)
+    assert np.array_equal(prct, prct_ans)
+
+
+def test_sample():
+    pass
+
+
+def test_train_randomforest():
+    pass

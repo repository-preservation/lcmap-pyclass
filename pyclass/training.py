@@ -44,7 +44,7 @@ def class_stats(dependent):
 
     # Find the percentage that each class makes up in the data set
     prct, _ = np.histogram(dependent, class_values.shape[0])
-    prct /= np.sum(prct, dtype=float)
+    prct = np.true_divide(prct, np.sum(prct))
 
     return class_values, prct
 
@@ -74,7 +74,7 @@ def sample(dependent, minimum=defaults.CLASS_MIN, maximum=defaults.CLASS_MAX,
     # that each one represents in the base data set
     adj_counts = np.ceil(total * percent)
     adj_counts[adj_counts > maximum] = maximum
-    # adj_counts[adj_counts < minimum] = minimum
+    adj_counts[adj_counts < minimum] = minimum
 
     selected_indices = []
     for cls, count in zip(class_values, adj_counts):
