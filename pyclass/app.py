@@ -68,3 +68,17 @@ def ensure_ndarray_input(func):
     def f(*args, **kwargs):
         return func(*(np.asarray(_) for _ in args), **kwargs)
     return f
+
+
+def gen_rng():
+    """
+    Helper method to create a new random number generator object.
+
+    See:
+        https://docs.scipy.org/doc/numpy/reference/generated/numpy.random.RandomState.html
+        https://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.random.set_state.html
+
+    Returns:
+        Numpy random number generating object
+    """
+    return np.random.RandomState()
