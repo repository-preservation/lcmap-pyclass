@@ -11,7 +11,7 @@ QA_CLOUD: 4
 ############################
 # Values related to training.
 ############################
-RANDOM_FOREST_ESTIMATORS: 500
+RANDOM_FOREST_ESTIMATORS: 100
 CLASS_MIN: 600
 CLASS_MAX: 8000
 TOTAL_SAMPLE_SIZE: 20000

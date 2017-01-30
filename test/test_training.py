@@ -28,6 +28,15 @@ def test_class_stats():
 
 def test_sample():
     pass
+    # rng1 = np.random.RandomState()
+    # seed = rng1.get_state()
+    #
+    # rng2 = np.random.RandomState
+    # rng2.set_state(seed)
+    #
+    # arr = np.array(list(range(5)) * 10)
+    #
+    # indices = training.sample(arr, random_state=rng2)
 
 
 def test_train_randomforest():
