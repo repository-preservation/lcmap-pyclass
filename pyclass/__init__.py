@@ -79,6 +79,27 @@ def train(trends, coefs, rmse, dem, aspect, slope, posidex, mpw, qa, random_seed
 
 
 def classify(model, coefs, rmse, dem, aspect, slope, posidex, mpw, qa):
+    """
+    Main module entry point for classifying a sample or series of samples.
+
+    Args:
+        model: Trained classifier model object.
+        coefs: 2-d array or list. The various coefficients generated from the
+            Continuous Change Detection module.
+        rmse: 2-d array or list. RMSE associated with the models that were
+            generated during the Continuous Change Detection module.
+        dem: 1-d array or list. Digital elevation model values.
+        aspect: 1-d array or list. DEM derived product.
+        slope: 1-d array or list. DEM derived product.
+        posidex: 1-d array or list. DEM derived product.
+        mpw: 1-d array or list.
+        qa: 2-d array or list. Observation quality values for the entire
+            history of the sample.
+
+    Returns:
+        probability for each class within each sample
+    """
+
     cloud_prob, snow_prob, water_prob = stats.quality_stats(qa)
 
     # Stack the independent arrays into a single cohesive block.
@@ -93,4 +114,5 @@ def classify(model, coefs, rmse, dem, aspect, slope, posidex, mpw, qa):
                              snow_prob[:, np.newaxis],
                              water_prob[:, np.newaxis]))
 
+    # TODO make this configurable
     return classifier.rf_predict(model, independent)
