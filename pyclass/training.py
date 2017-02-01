@@ -85,7 +85,7 @@ def sample(dependent, minimum=defaults.CLASS_MIN, maximum=defaults.CLASS_MAX,
         indices = random_state.permutation(indices)
 
         # Add the index locations up to the count
-        selected_indices.extend(indices[:count])
+        selected_indices.extend(indices[:int(count)])
 
     return selected_indices
 
@@ -125,4 +125,4 @@ def train_randomforest(independent, dependent,
                                      n_estimators=n_estimators)
     rfmodel.fit(X, y)
 
-    return rfmodel, random_state
+    return rfmodel

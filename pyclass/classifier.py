@@ -12,6 +12,12 @@ def rf_predict(forest, X):
         X: Samples to be classified.
 
     Returns:
+        class values
         probability for each class within each sample
     """
-    return forest.predict_proba(X)
+    # Will get a deprecation warning on a single sample if it is not
+    # 2-d
+    if len(X.shape) < 2:
+        X = X.reshape(1, -1)
+
+    return forest.classes_, forest.predict_proba(X)

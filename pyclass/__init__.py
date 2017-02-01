@@ -44,8 +44,8 @@ def train(trends, coefs, rmse, dem, aspect, slope, posidex, mpw, qa, random_seed
 
 
     Returns:
-        prediction model for classified
-        initialzed numpy RandomState object
+        SKLearn RandomForestClassifier object, prediction model
+        tuple used for setting the state of a numpy RandomState object
 
     """
     # Make sure we have proper governance in place for random number generation
@@ -97,7 +97,8 @@ def classify(model, coefs, rmse, dem, aspect, slope, posidex, mpw, qa):
             history of the sample.
 
     Returns:
-        probability for each class within each sample
+        1-d ndarray of ordered class values represented in the model
+        2-d ndarray of the probability for each class within each sample
     """
 
     cloud_prob, snow_prob, water_prob = stats.quality_stats(qa)
