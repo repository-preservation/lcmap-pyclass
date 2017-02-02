@@ -9,8 +9,10 @@ Module level constructs are only evaluated once in a Python application's
 lifecycle, usually at the time of first import. This pattern is borrowed
 from Flask.
 """
-import logging
-import sys
+import os, logging, sys, yaml
+from functools import wraps
+
+import numpy as np
 
 
 ############################
@@ -30,3 +32,53 @@ logging.basicConfig(stream=sys.stdout,
                     level=logging.DEBUG,
                     format=__format,
                     datefmt='%Y-%m-%d %H:%M:%S')
+
+
+# Simplify parameter setting and make it easier for adjustment
+class Defaults(dict):
+    def __init__(self, config_path='parameters.yaml'):
+        with open(config_path, 'r') as f:
+            super(Defaults, self).__init__(yaml.load(f.read()))
+
+    def __getattr__(self, name):
+        if name in self:
+            return self[name]
+        else:
+            raise AttributeError('No such attribute: ' + name)
+
+    def __setattr__(self, name, value):
+        self[name] = value
+
+    def __delattr__(self, name):
+        if name in self:
+            del self[name]
+        else:
+            raise AttributeError('No such attribute: ' + name)
+
+
+defaults = Defaults(os.path.join(os.path.dirname(__file__), 'parameters.yaml'))
+
+
+def ensure_ndarray_input(func):
+    """
+    Wrapper to ensure inputs to a method are of type ndarray
+    This cleans up subsequent code that might need to check for this
+    """
+    @wraps(func)
+    def f(*args, **kwargs):
+        return func(*(np.asarray(_) for _ in args), **kwargs)
+    return f
+
+
+def gen_rng():
+    """
+    Helper method to create a new random number generator object.
+
+    See:
+        https://docs.scipy.org/doc/numpy/reference/generated/numpy.random.RandomState.html
+        https://docs.scipy.org/doc/numpy-1.10.0/reference/generated/numpy.random.set_state.html
+
+    Returns:
+        Numpy random number generating object
+    """
+    return np.random.RandomState()
