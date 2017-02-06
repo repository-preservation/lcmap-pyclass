@@ -79,6 +79,6 @@ setup(
     tests_require=['pytest>=3.0.2'],
 
     package_data={
-        'ccd': ['parameters.yaml'],
-    },
+        'pyclass': ['parameters.yaml'],
+    }
 )
