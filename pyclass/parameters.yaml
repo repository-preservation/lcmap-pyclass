@@ -1,12 +1,22 @@
 ############################
 # Representative values in the QA band.
+# If QA_BITPACKED is true, then the values represent the offsets.
+# QA_NAN is always a straight value, regardless of QA_BITPACKED.
 ############################
-QA_FILL: 255
-QA_CLEAR: 0
-QA_WATER: 1
-QA_SHADOW: 2
-QA_SNOW: 3
-QA_CLOUD: 4
+QA_BITPACKED: true
+#QA_FILL: 255
+#QA_CLEAR: 0
+#QA_WATER: 1
+#QA_SHADOW: 2
+#QA_SNOW: 3
+#QA_CLOUD: 4
+QA_FILL: 0
+QA_CLEAR: 1
+QA_WATER: 2
+QA_SHADOW: 3
+QA_SNOW: 4
+QA_CLOUD: 5
+QA_NAN: -1
 
 ############################
 # Values related to training.
@@ -25,3 +35,8 @@ TARGET_FROM:
 TARGET_TO:
   - 10
   - 10
+
+test:
+  test2:
+    - 1
+    - 2 
