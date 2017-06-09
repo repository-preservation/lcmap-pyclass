@@ -1,5 +1,6 @@
-from pyclass import app
-log = app.logging.getLogger(__name__)
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def rf_predict(forest, X):

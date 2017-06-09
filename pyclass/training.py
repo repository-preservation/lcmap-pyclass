@@ -1,31 +1,13 @@
+import logging
+
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
-from pyclass.app import logging, defaults, gen_rng
+from pyclass.app import get_params, gen_rng
 
 
 log = logging.getLogger(__name__)
-
-
-def reclass_target(vector, tgt_from=defaults.TARGET_FROM, tgt_to=defaults.TARGET_TO):
-    """
-    Handle classes in the target data set that need to be combined or recoded.
-
-    Args:
-        vector: 1-d ndarray.
-        tgt_from: list of ints, must be the same size as tgt_to
-        tgt_to: list of ints, must be the same size as tgt_from
-
-    Returns:
-        1-d ndarray of recoded values.
-    """
-    # Let's try to mitigate any mutability issues
-    out = vector[:]
-
-    for i in range(len(tgt_from)):
-        out[out == tgt_from[i]] = tgt_to[i]
-
-    return out
+defaults = get_params()
 
 
 def class_stats(dependent):
