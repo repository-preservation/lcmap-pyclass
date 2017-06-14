@@ -1,13 +1,17 @@
 """
 Main lead in methods
 """
+import logging
+
 import numpy as np
 
-from pyclass import app, stats, training, classifier
-log = app.logging.getLogger(__name__)
+from pyclass import app, stats, training, classifier, change
+
+log = logging.getLogger(__name__)
 
 
-def train(trends, coefs, rmse, dem, aspect, slope, posidex, mpw, qa, random_seed=None):
+def train(trends, ccd, dem, aspect, slope, posidex, mpw, qa, random_seed=None,
+          proc_params=app.get_params()):
     """
     Main module entry point for training a new classification model.
 
@@ -29,6 +33,8 @@ def train(trends, coefs, rmse, dem, aspect, slope, posidex, mpw, qa, random_seed
     Args:
         trends: 1-d array or list. Representative values that are trying
             to be predicted given other predictors. Dependent variable.
+        ccd: 1-d array of dict like structure conforming to the pyccd output
+            structure. https://github.com/USGS-EROS/lcmap-pyccd
         coefs: 2-d array or list. The various coefficients generated from the
             Continuous Change Detection module.
         rmse: 2-d array or list. RMSE associated with the models that were
@@ -48,6 +54,12 @@ def train(trends, coefs, rmse, dem, aspect, slope, posidex, mpw, qa, random_seed
         tuple used for setting the state of a numpy RandomState object
 
     """
+    begin = proc_params['BEGIN_DATE']
+    end = proc_params['END_DATE']
+    bands = [proc_params['BAND_NAMES'][i]
+             for i in sorted(proc_params['BAND_NAMES'])]
+    coef_count = proc_params['COEF_COUNT']
+
     # Make sure we have proper governance in place for random number generation
     random_state = app.gen_rng()
 
@@ -58,6 +70,8 @@ def train(trends, coefs, rmse, dem, aspect, slope, posidex, mpw, qa, random_seed
 
     # Turn the QA values into requisite three probabilities
     cloud_prob, snow_prob, water_prob = stats.quality_stats(qa)
+
+    coefs, rmse = change.filter_ccd(ccd, begin, end, bands, coef_count)
 
     # Stack the independent arrays into a single cohesive block.
     independent = np.hstack((coefs,

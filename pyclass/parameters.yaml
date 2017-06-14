@@ -25,18 +25,20 @@ RANDOM_FOREST_ESTIMATORS: 100
 CLASS_MIN: 600
 CLASS_MAX: 8000
 TOTAL_SAMPLE_SIZE: 20000
+BEGIN_DATE: 729755
+END_DATE: 730850
 
 ############################
-# Reclassify values in the target data set used for training.
+# Spectral band names used in pyccd results.
 ############################
-TARGET_FROM:
-  - 3
-  - 4
-TARGET_TO:
-  - 10
-  - 10
+BAND_NAMES:
+  0: blue
+  1: green
+  2: red
+  3: nir
+  4: swir1
+  5: swir2
+  6: thermal
 
-test:
-  test2:
-    - 1
-    - 2 
+COEF_COUNT: 8
+

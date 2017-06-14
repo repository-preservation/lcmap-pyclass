@@ -19,19 +19,6 @@ import numpy as np
 __paramfile_path = os.path.join(os.path.dirname(__file__), 'parameters.yaml')
 
 
-# Simple container object to hold parameters.
-class Parameters(object):
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
-
-        for kw, item in kwargs.items():
-            if isinstance(item, dict):
-                setattr(self, kw, Parameters(**kwargs[kw]))
-
-    def __repr__(self):
-        return repr(self.__dict__)
-
-
 def get_params(yaml_file=__paramfile_path):
     """
     Generates a Parameters object from a given yaml file path.
@@ -43,7 +30,7 @@ def get_params(yaml_file=__paramfile_path):
         Parameters object
     """
     with open(yaml_file) as f:
-        return Parameters(**yaml.load(f))
+        return yaml.load(f)
 
 
 def gen_rng():
