@@ -3,42 +3,37 @@
 # If QA_BITPACKED is true, then the values represent the offsets.
 # QA_NAN is always a straight value, regardless of QA_BITPACKED.
 ############################
-QA_BITPACKED: true
-#QA_FILL: 255
-#QA_CLEAR: 0
-#QA_WATER: 1
-#QA_SHADOW: 2
-#QA_SNOW: 3
-#QA_CLOUD: 4
-QA_FILL: 0
-QA_CLEAR: 1
-QA_WATER: 2
-QA_SHADOW: 3
-QA_SNOW: 4
-QA_CLOUD: 5
-QA_NAN: -1
+qa:
+  bitpacked: true
+  fill: 0
+  clear: 1
+  water: 2
+  shadow: 3
+  snow: 4
+  cloud: 5
+  nan: -1
 
 ############################
 # Values related to training.
 ############################
-RANDOM_FOREST_ESTIMATORS: 100
-CLASS_MIN: 600
-CLASS_MAX: 8000
-TOTAL_SAMPLE_SIZE: 20000
-BEGIN_DATE: 729755
-END_DATE: 730850
+randomforest:
+  estimators: 100
+  class_min: 600
+  class_max: 8000
+  total_samples: 20000
 
 ############################
-# Spectral band names used in pyccd results.
+# Values related to CCD.
 ############################
-BAND_NAMES:
-  0: blue
-  1: green
-  2: red
-  3: nir
-  4: swir1
-  5: swir2
-  6: thermal
-
-COEF_COUNT: 8
-
+ccd:
+  begin_date: 729755
+  end_date: 730850
+  coef_count: 8
+  bands:
+    0: blue
+    1: green
+    2: red
+    3: nir
+    4: swir1
+    5: swir2
+    6: thermal

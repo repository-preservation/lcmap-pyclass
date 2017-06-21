@@ -5,12 +5,12 @@ import logging
 
 import numpy as np
 
-from pyclass import app, stats, training, classifier, change
+from pyclass import app, stats, training, classifier, change, qa
 
 log = logging.getLogger(__name__)
 
 
-def train(trends, ccd, dem, aspect, slope, posidex, mpw, qa, random_seed=None,
+def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=None,
           proc_params=app.get_params()):
     """
     Main module entry point for training a new classification model.
@@ -44,7 +44,7 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, qa, random_seed=None,
         slope: 1-d array or list. DEM derived product.
         posidex: 1-d array or list. DEM derived product.
         mpw: 1-d array or list.
-        qa: 2-d array or list. Observation quality values for the entire
+        quality: 2-d array or list. Observation quality values for the entire
             history of the sample.
         random_seed: tuple used to initialize a numpy RandomState object or None
 
@@ -54,11 +54,9 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, qa, random_seed=None,
         tuple used for setting the state of a numpy RandomState object
 
     """
-    begin = proc_params['BEGIN_DATE']
-    end = proc_params['END_DATE']
-    bands = [proc_params['BAND_NAMES'][i]
-             for i in sorted(proc_params['BAND_NAMES'])]
-    coef_count = proc_params['COEF_COUNT']
+    qainfo = proc_params['qa']
+    ccdinfo = proc_params['ccd']
+    rfinfo = proc_params['randomforest']
 
     # Make sure we have proper governance in place for random number generation
     random_state = app.gen_rng()
@@ -69,9 +67,9 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, qa, random_seed=None,
         random_state.set_state(random_seed)
 
     # Turn the QA values into requisite three probabilities
-    cloud_prob, snow_prob, water_prob = stats.quality_stats(qa)
+    cloud_prob, snow_prob, water_prob = qa.quality_stats(quality, qainfo)
 
-    coefs, rmse = change.filter_ccd(ccd, begin, end, bands, coef_count)
+    coefs, rmse = change.filter_ccd(ccd, ccdinfo)
 
     # Stack the independent arrays into a single cohesive block.
     independent = np.hstack((coefs,
@@ -92,12 +90,15 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, qa, random_seed=None,
     return model, random_seed
 
 
-def classify(model, coefs, rmse, dem, aspect, slope, posidex, mpw, qa):
+def classify(ccd, dem, aspect, slope, posidex, mpw, quality,
+             proc_params=app.get_params()):
     """
     Main module entry point for classifying a sample or series of samples.
 
     Args:
         model: Trained classifier model object.
+        ccd: 1-d array of dict like structure conforming to the pyccd output
+            structure. https://github.com/USGS-EROS/lcmap-pyccd
         coefs: 2-d array or list. The various coefficients generated from the
             Continuous Change Detection module.
         rmse: 2-d array or list. RMSE associated with the models that were
@@ -107,7 +108,7 @@ def classify(model, coefs, rmse, dem, aspect, slope, posidex, mpw, qa):
         slope: 1-d array or list. DEM derived product.
         posidex: 1-d array or list. DEM derived product.
         mpw: 1-d array or list.
-        qa: 2-d array or list. Observation quality values for the entire
+        quality: 2-d array or list. Observation quality values for the entire
             history of the sample.
 
     Returns:
@@ -115,7 +116,8 @@ def classify(model, coefs, rmse, dem, aspect, slope, posidex, mpw, qa):
         2-d ndarray of the probability for each class within each sample
     """
 
-    cloud_prob, snow_prob, water_prob = stats.quality_stats(qa)
+    cloud_prob, snow_prob, water_prob = qa.quality_stats(quality,
+                                                         proc_params['qa'])
 
     # Stack the independent arrays into a single cohesive block.
     independent = np.hstack((coefs,

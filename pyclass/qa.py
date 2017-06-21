@@ -1,12 +1,10 @@
 """
-Filters related to qa values associated with samples.
+ARD QA related methods.
 """
 import numpy as np
 
-from pyclass.app import defaults
 
-
-def unpackqa(quality, proc_params):
+def unpackqa(quality, qainfo):
     """
     Transform the bit-packed QA values into their bit offset.
 
@@ -17,26 +15,26 @@ def unpackqa(quality, proc_params):
 
     Args:
         quality: 1-d array or list of bit-packed QA values
-        proc_params: dictionary of processing parameters
+        qainfo: dict of associated qa information
 
     Returns:
         1-d ndarray
     """
     output = np.ones_like(quality)
-    output.fill(proc_params.QA_NAN)
+    output.fill(qainfo['nan'])
 
     # Reverse hierarchy, values later in the list will overwrite earlier values
-    heirarchy = (proc_params.QA_CLEAR,
-                 proc_params.QA_WATER,
-                 proc_params.QA_SNOW,
-                 proc_params.QA_SHADOW,
-                 proc_params.QA_CLOUD,
-                 proc_params.QA_FILL)
+    heirarchy = (qainfo['clear'],
+                 qainfo['water'],
+                 qainfo['snow'],
+                 qainfo['shadow'],
+                 qainfo['cloud'],
+                 qainfo['fill'])
 
     for offset in heirarchy:
         output[(quality & 1 << offset) > 0] = offset
 
-    check_unbitpack(output, quality, proc_params.QA_NAN)
+    check_unbitpack(output, quality, qainfo['nan'])
 
     return output
 
@@ -58,9 +56,8 @@ def check_unbitpack(unpacked, packed, nan):
                          .format(np.unique(packed[unpacked == nan])))
 
 
-def quality_stats(quality, clear=defaults.QA_CLEAR, water=defaults.QA_WATER,
-                  snow=defaults.QA_SNOW, cloud=defaults.QA_CLOUD,
-                  fill=defaults.QA_FILL):
+# noinspection PyTypeChecker
+def quality_stats(quality, qainfo):
     """
     Take the initial quality information for the entire time series, then
     calculate the probabilities for cloud, snow, and water. These outputs are
@@ -68,26 +65,24 @@ def quality_stats(quality, clear=defaults.QA_CLEAR, water=defaults.QA_WATER,
 
     Args:
         quality: QA values from all available observations
-        clear: int value representing clear
-        water: int value representing water
-        snow: int value representing snow
-        cloud: int value representing cloud
-        fill: int value representing fill/nodata
+        qainfo: dict of associated qa information
 
     Returns:
         1-d ndarray: cloud probability
         1-d ndarray: snow probability
         1-d ndarray: water probability
-
     """
-    total_count = np.sum(quality != fill, axis=1)
-    clear_water_count = np.sum((quality == clear) | (quality == water), axis=1)
-    cloud_count = np.sum(quality == cloud, axis=1)
-    snow_count = np.sum(quality == snow, axis=1)
-    water_count = np.sum(quality == water, axis=1)
+    quality = unpackqa(quality, qainfo)
 
-    cloud_prob = cloud_count / total_count * 100
-    snow_prob = snow_count / (clear_water_count + snow_count + 0.01) * 100
-    water_prob = water_count / (clear_water_count + 0.01) * 100
+    total_count = np.sum(quality != qainfo['fill'], axis=1)
+    clear_water_count = np.sum((quality == qainfo['clear']) |
+                               (quality == qainfo['water']), axis=1)
+    cloud_count = np.sum(quality == qainfo['cloud'], axis=1)
+    snow_count = np.sum(quality == qainfo['snow'], axis=1)
+    water_count = np.sum(quality == qainfo['water'], axis=1)
+
+    cloud_prob = cloud_count / total_count
+    snow_prob = snow_count / (clear_water_count + snow_count + 0.01)
+    water_prob = water_count / (clear_water_count + 0.01)
 
     return cloud_prob, snow_prob, water_prob

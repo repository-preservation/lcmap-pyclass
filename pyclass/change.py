@@ -8,46 +8,42 @@ ChangeModel = namedtuple('ChangeModel', 'start_day end_day coefs rmses')
 log = logging.getLogger(__name__)
 
 
-def filter_ccd(ccd, begin_date, end_date, bands, coef_count):
+def filter_ccd(ccd, ccdinfo):
     """
     Filter the ccd results based on the time segments to ensure they fall
     within a given time range.
 
     Args:
         ccd: pyccd results
-        begin_date: ordinal day
-        end_date: ordinal day
-        bands: list of band names used by pyccd
-        coef_count: default number of coefficients used by pyccd
+        ccdinfo: dict of CCD related processing parameters
 
     Returns:
         1-d ndarray
         1-d ndarray
     """
-    models = unpack_ccd(ccd, bands, coef_count)
+    models = unpack_ccd(ccd, ccdinfo)
 
     for model in models:
-        if check_coverage(model, begin_date, end_date):
+        if check_coverage(model, ccdinfo['begin_day'], ccdinfo['end_day']):
             return model.coefs, model.rmses
 
 
-def unpack_ccd(ccd, bands, coef_count):
+def unpack_ccd(ccd, ccdinfo):
     """
     Unpacks the curve fit information for all change models contained in a
     pyccd result.
 
     Args:
         ccd: pyccd results
-        bands: list of band names used by pyccd
-        coef_count: default number of coefficients used by pyccd
+        ccdinfo: dict of CCD related processing parameters
 
     Returns:
-
+        list of ChangeModel namedtuple's
     """
     models = []
 
     for model in ccd['change_models']:
-        curveinfo = extract_curve(model, bands, coef_count)
+        curveinfo = extract_curve(model, ccdinfo['bands'], ccdinfo['coef_count'])
 
         models.append(ChangeModel(start_day=model['start_day'],
                                   end_day=model['end_day'],
@@ -93,3 +89,17 @@ def check_coverage(model, begin_ord, end_ord):
         bool
     """
     return model.start_day <= begin_ord & model.end_day >= end_ord
+
+
+def band_list(bands_dict):
+    """
+    Helper method to take the band dictionary from the parameters, and create
+    a list of the values ordered on the keys.
+
+    Args:
+        bands_dict: dictionary related the order of the band names
+
+    Returns:
+        list
+    """
+    return [bands_dict[k] for k in sorted(bands_dict.keys())]
