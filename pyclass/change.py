@@ -21,11 +21,36 @@ def filter_ccd(ccd, ccdinfo):
         1-d ndarray
         1-d ndarray
     """
-    models = unpack_ccd(ccd, ccdinfo)
+    coefs = []
+    rmse = []
+
+    for result in ccd:
+        c, r = filter_result(result, ccdinfo)
+        coefs.append(c)
+        rmse.append(r)
+
+    return np.array(coefs), np.array(rmse)
+
+
+def filter_result(result, ccdinfo):
+    """
+    Filter a CCD result for a pixel looking for a change model that meets the
+    specified temporal criteria.
+
+    Args:
+        result: CCD result for a pixel
+        ccdinfo: dict of CCD related processing parameters
+    Returns:
+        1-d list, 1-d list or None, None
+    """
+
+    models = unpack_ccd(result, ccdinfo)
 
     for model in models:
         if check_coverage(model, ccdinfo['begin_day'], ccdinfo['end_day']):
             return model.coefs, model.rmses
+
+    return None, None
 
 
 def unpack_ccd(ccd, ccdinfo):

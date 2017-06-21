@@ -115,9 +115,11 @@ def classify(ccd, dem, aspect, slope, posidex, mpw, quality,
         1-d ndarray of ordered class values represented in the model
         2-d ndarray of the probability for each class within each sample
     """
+    qainfo = proc_params['qa']
+    ccdinfo = proc_params['ccd']
+    rfinfo = proc_params['randomforest']
 
-    cloud_prob, snow_prob, water_prob = qa.quality_stats(quality,
-                                                         proc_params['qa'])
+    cloud_prob, snow_prob, water_prob = qa.quality_stats(quality, qainfo)
 
     # Stack the independent arrays into a single cohesive block.
     independent = np.hstack((coefs,
