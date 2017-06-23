@@ -1,15 +1,20 @@
 import numpy as np
 
-from pyclass import stats
+import pyclass
+
+
+params = pyclass.app.get_params()
 
 
 def test_quality_stats():
-    qa = [[4, 4, 4, 4],
-          [4, 4, 255, 255],
-          [3, 3, 3, 3],
-          [1, 1, 1, 1],
-          [0, 4, 4, 0],
-          [0, 1, 3, 4]]
+    qainfo = params['qa']
+
+    qa = [[32, 32, 32, 32],
+          [32, 32, 1, 1],
+          [16, 16, 16, 16],
+          [4, 4, 4, 4],
+          [2, 32, 32, 2],
+          [2, 4, 16, 32]]
 
     cloud_prob = np.array([100,
                            100,
@@ -32,7 +37,7 @@ def test_quality_stats():
                            0,
                            1 / 2.01 * 100])
 
-    cloud, snow, water = stats.quality_stats(qa)
+    cloud, snow, water = pyclass.qa.quality_stats(qa, qainfo)
 
     assert np.array_equal(cloud_prob, cloud)
     assert np.array_equal(snow_prob, snow)
