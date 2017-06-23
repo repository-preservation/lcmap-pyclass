@@ -17,10 +17,13 @@ qa:
 # Values related to training.
 ############################
 randomforest:
-  estimators: 100
+  estimators: 500
   class_min: 600
   class_max: 8000
-  total_samples: 20000
+  target_samples: 20000
+  train_exclude:
+   - 0
+   - 9
 
 ############################
 # Values related to CCD.
@@ -29,7 +32,7 @@ ccd:
   begin_date: 729755
   end_date: 730850
   coef_count: 8
-  bands:
+  bands: # Ensure order by using a dict instead of a simple list.
     0: blue
     1: green
     2: red

@@ -11,25 +11,31 @@ log = logging.getLogger(__name__)
 def filter_ccd(ccd, ccdinfo):
     """
     Filter the ccd results based on the time segments to ensure they fall
-    within a given time range.
+    within a given time range. Returns a list of coefficients, rmse's, and
+    their index locations from the input array.
 
     Args:
         ccd: pyccd results
         ccdinfo: dict of CCD related processing parameters
 
     Returns:
-        1-d ndarray
-        1-d ndarray
+        2-d ndarray coefficient values
+        2-d ndarray rmse values
+        1-d ndarray index locations
     """
     coefs = []
     rmse = []
+    idx = []
 
-    for result in ccd:
-        c, r = filter_result(result, ccdinfo)
-        coefs.append(c)
-        rmse.append(r)
+    results = [filter_result(r, ccdinfo) for r in ccd]
 
-    return np.array(coefs), np.array(rmse)
+    for i, res in enumerate(results):
+        if res:
+            coefs.append(res[0])
+            rmse.append(res[1])
+            idx.append(i)
+
+    return np.array(coefs), np.array(rmse), np.array(idx)
 
 
 def filter_result(result, ccdinfo):
@@ -41,16 +47,14 @@ def filter_result(result, ccdinfo):
         result: CCD result for a pixel
         ccdinfo: dict of CCD related processing parameters
     Returns:
-        1-d list, 1-d list or None, None
+        1-d ndarray
+        1-d ndarray
     """
-
     models = unpack_ccd(result, ccdinfo)
 
     for model in models:
         if check_coverage(model, ccdinfo['begin_day'], ccdinfo['end_day']):
             return model.coefs, model.rmses
-
-    return None, None
 
 
 def unpack_ccd(ccd, ccdinfo):
@@ -68,7 +72,7 @@ def unpack_ccd(ccd, ccdinfo):
     models = []
 
     for model in ccd['change_models']:
-        curveinfo = extract_curve(model, ccdinfo['bands'], ccdinfo['coef_count'])
+        curveinfo = extract_curve(model, ccdinfo)
 
         models.append(ChangeModel(start_day=model['start_day'],
                                   end_day=model['end_day'],
@@ -78,20 +82,21 @@ def unpack_ccd(ccd, ccdinfo):
     return models
 
 
-def extract_curve(model, bands, coef_count):
+def extract_curve(model, ccdinfo):
     """
     Helper method to pull out the curve fit information from a given model
     and return it as two flattened ndarrays.
 
     Args:
         model: pyccd change model as a dict
-        bands: list of band names used by pyccd
-        coef_count: default number of coefficients used by pyccd
+        ccdinfo: dict of CCD related processing parameters
     Returns:
         1-d ndarray
         1-d ndarray
     """
-    coefs = np.zeros(shape=(len(bands), coef_count))
+    bands = band_list(ccdinfo['bands'])
+
+    coefs = np.zeros(shape=(len(bands), ccdinfo['coef_count']))
     rmse = np.full(shape=(len(bands),), fill_value=-1)
 
     for i, b in enumerate(bands):

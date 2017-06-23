@@ -69,19 +69,19 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=No
     # Turn the QA values into requisite three probabilities
     cloud_prob, snow_prob, water_prob = qa.quality_stats(quality, qainfo)
 
-    coefs, rmse = change.filter_ccd(ccd, ccdinfo)
+    coefs, rmse, idx = change.filter_ccd(ccd, ccdinfo)
 
     # Stack the independent arrays into a single cohesive block.
     independent = np.hstack((coefs,
                              rmse,
-                             dem[:, np.newaxis],
-                             aspect[:, np.newaxis],
-                             slope[:, np.newaxis],
-                             posidex[:, np.newaxis],
-                             mpw[:, np.newaxis],
-                             cloud_prob[:, np.newaxis],
-                             snow_prob[:, np.newaxis],
-                             water_prob[:, np.newaxis]))
+                             dem[idx, np.newaxis],
+                             aspect[idx, np.newaxis],
+                             slope[idx, np.newaxis],
+                             posidex[idx, np.newaxis],
+                             mpw[idx, np.newaxis],
+                             cloud_prob[idx, np.newaxis],
+                             snow_prob[idx, np.newaxis],
+                             water_prob[idx, np.newaxis]))
 
     # Where we need to get to.
     # TODO makes this configurable
