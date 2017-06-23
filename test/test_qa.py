@@ -16,28 +16,28 @@ def test_quality_stats():
           [2, 32, 32, 2],
           [2, 4, 16, 32]]
 
-    cloud_prob = np.array([100,
-                           100,
+    cloud_prob = np.array([1,
+                           1,
                            0,
                            0,
-                           50,
-                           25])
+                           .50,
+                           .25])
 
     snow_prob = np.array([0,
                           0,
-                          4 / 4.01 * 100,
+                          4 / 4.01,
                           0,
                           0,
-                          1 / 3.01 * 100])
+                          1 / 3.01])
 
     water_prob = np.array([0,
                            0,
                            0,
-                           4 / 4.01 * 100,
+                           4 / 4.01,
                            0,
-                           1 / 2.01 * 100])
+                           1 / 2.01])
 
-    cloud, snow, water = pyclass.qa.quality_stats(qa, qainfo)
+    cloud, snow, water = pyclass.qa.quality_stats(np.array(qa), qainfo)
 
     assert np.array_equal(cloud_prob, cloud)
     assert np.array_equal(snow_prob, snow)

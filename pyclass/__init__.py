@@ -85,7 +85,8 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=No
 
     # Where we need to get to.
     # TODO makes this configurable
-    model = training.train_randomforest(independent, trends, random_state=random_state)
+    model = training.train_randomforest(independent, trends, rfinfo,
+                                        random_state=random_state)
 
     return model, random_seed
 

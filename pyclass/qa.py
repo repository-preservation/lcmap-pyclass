@@ -18,7 +18,7 @@ def unpackqa(quality, qainfo):
         qainfo: dict of associated qa information
 
     Returns:
-        1-d ndarray
+        ndarray: quality as thematic values
     """
     output = np.ones_like(quality)
     output.fill(qainfo['nan'])

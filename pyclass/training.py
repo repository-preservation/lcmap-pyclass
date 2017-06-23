@@ -3,11 +3,10 @@ import logging
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
-from pyclass.app import get_params, gen_rng
+from pyclass.app import gen_rng
 
 
 log = logging.getLogger(__name__)
-defaults = get_params()
 
 
 def class_stats(dependent):
@@ -31,8 +30,7 @@ def class_stats(dependent):
     return class_values, prct
 
 
-def sample(dependent, minimum=defaults.CLASS_MIN, maximum=defaults.CLASS_MAX,
-           total=defaults.TOTAL_SAMPLE_SIZE, random_state=None):
+def sample(dependent, rfinfo, random_state=None):
     """
     Since we have a maximum number of samples that we want to hit
 
@@ -54,9 +52,9 @@ def sample(dependent, minimum=defaults.CLASS_MIN, maximum=defaults.CLASS_MAX,
 
     # Adjust the target counts that we are wanting based on the percentage
     # that each one represents in the base data set
-    adj_counts = np.ceil(total * percent)
-    adj_counts[adj_counts > maximum] = maximum
-    adj_counts[adj_counts < minimum] = minimum
+    adj_counts = np.ceil(rfinfo['target_samples'] * percent)
+    adj_counts[adj_counts > rfinfo['class_max']] = rfinfo['class_max']
+    adj_counts[adj_counts < rfinfo['class_min']] = rfinfo['class_min']
 
     selected_indices = []
     for cls, count in zip(class_values, adj_counts):
@@ -72,9 +70,7 @@ def sample(dependent, minimum=defaults.CLASS_MIN, maximum=defaults.CLASS_MAX,
     return selected_indices
 
 
-def train_randomforest(independent, dependent,
-                       n_estimators=defaults.RANDOM_FOREST_ESTIMATORS,
-                       random_state=None):
+def train_randomforest(independent, dependent, rfinfo, random_state=None):
     """
     Train a random forest with a given set independent variables and an
     array of target/dependent values.
@@ -95,7 +91,7 @@ def train_randomforest(independent, dependent,
     """
     # First we need to determine which samples we want to use, based on the
     # distribution of the target/dependant data set.
-    indices = sample(dependent, random_state=random_state)
+    indices = sample(dependent, rfinfo, random_state=random_state)
 
     # Grab the samples that we want from the data sets.
     X = independent[indices]
@@ -104,7 +100,7 @@ def train_randomforest(independent, dependent,
     # Initialize the RandomForestClassifier then produce a fit for
     # the data sets.
     rfmodel = RandomForestClassifier(random_state=random_state,
-                                     n_estimators=n_estimators)
+                                     n_estimators=rfinfo['estimators'])
     rfmodel.fit(X, y)
 
     return rfmodel

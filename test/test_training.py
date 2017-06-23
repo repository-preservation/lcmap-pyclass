@@ -1,19 +1,9 @@
 import numpy as np
 
+import pyclass
 from pyclass import training, classifier
 
-
-def test_reclass_target():
-    arr = np.arange(5)
-
-    tgt_from = [2, 1]
-    tgt_to = [3, 3]
-
-    ans = np.array([0, 3, 3, 3, 4])
-
-    res = training.reclass_target(arr, tgt_from, tgt_to)
-
-    assert np.array_equal(ans, res)
+params = pyclass.app.get_params()
 
 
 def test_class_stats():
@@ -33,7 +23,7 @@ def test_sample():
 
     arr = np.array(list(range(5)) * 5)
 
-    indices = training.sample(arr, minimum=1, maximum=3, random_state=rng1)
+    indices = training.sample(arr, params['randomforest'], random_state=rng1)
 
     ans = [10, 5, 20, 1, 11, 21, 12, 17, 7, 18, 3, 8, 19, 4, 9]
 
