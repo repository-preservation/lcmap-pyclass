@@ -53,7 +53,7 @@ def filter_result(result, ccdinfo):
     models = unpack_ccd(result, ccdinfo)
 
     for model in models:
-        if check_coverage(model, ccdinfo['begin_day'], ccdinfo['end_day']):
+        if check_coverage(model, ccdinfo['begin_date'], ccdinfo['end_date']):
             return model.coefs, model.rmses
 
 
@@ -90,6 +90,7 @@ def extract_curve(model, ccdinfo):
     Args:
         model: pyccd change model as a dict
         ccdinfo: dict of CCD related processing parameters
+
     Returns:
         1-d ndarray
         1-d ndarray
@@ -97,7 +98,7 @@ def extract_curve(model, ccdinfo):
     bands = band_list(ccdinfo['bands'])
 
     coefs = np.zeros(shape=(len(bands), ccdinfo['coef_count']))
-    rmse = np.full(shape=(len(bands),), fill_value=-1)
+    rmse = np.zeros(shape=(len(bands),))
 
     for i, b in enumerate(bands):
         coefs[i] = model[b]['coefficients'] + [model[b]['intercept']]
@@ -115,10 +116,11 @@ def check_coverage(model, begin_ord, end_ord):
         model: pyccd result model as a namedtuple
         begin_ord: ordinal day
         end_ord: ordinal day
+
     Returns:
         bool
     """
-    return model.start_day <= begin_ord & model.end_day >= end_ord
+    return (model.start_day <= begin_ord) & (model.end_day >= end_ord)
 
 
 def band_list(bands_dict):

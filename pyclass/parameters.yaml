@@ -31,7 +31,7 @@ randomforest:
 ccd:
   begin_date: 729755
   end_date: 730850
-  coef_count: 8
+  coef_count: 8  # includes intercept
   bands: # Ensure order by using a dict instead of a simple list.
     0: blue
     1: green
