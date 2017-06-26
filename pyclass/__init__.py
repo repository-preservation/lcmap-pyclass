@@ -6,8 +6,38 @@ import logging
 import numpy as np
 
 from pyclass import app, stats, training, classifier, change, qa
+from .version import __version__
+from .version import __algorithm__ as algorithm
+from .version import __name
 
 log = logging.getLogger(__name__)
+
+
+def __attach_trainmetadata(model, random_seed, metrics, messages):
+    """
+    Helper method to attach information and format processing information.
+
+    {algorithm: string,
+     rf_model: sklearn.ensemble.RandomForestClassifier object,
+     random_state: tuple,
+     metrics: dict,
+     messages: list of strings}
+
+    Args:
+        model: sklearn random forest object
+        random_seed: tuple used to initialize a numpy RandomState object
+        metrics: dict showing performance metrics of the model during training
+        messages: information messages pertaining to potential issues related
+            to samples or otherwise
+
+    Returns:
+        dict
+    """
+    return {'algorithm': algorithm,
+            'rf_model': model,
+            'random_state': random_seed,
+            'metrics': metrics,
+            'messages': messages}
 
 
 def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=None,
