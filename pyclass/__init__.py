@@ -20,15 +20,16 @@ def __attach_trainmetadata(model, random_seed, metrics, messages):
     {algorithm: string,
      rf_model: sklearn.ensemble.RandomForestClassifier object,
      random_state: tuple,
-     metrics: dict,
+     metrics: string,
      messages: list of strings}
 
     Args:
         model: sklearn random forest object
         random_seed: tuple used to initialize a numpy RandomState object
-        metrics: dict showing performance metrics of the model during training
-        messages: information messages pertaining to potential issues related
-            to samples or otherwise
+        metrics: string of performance metrics of the model during training
+            http://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html
+        messages: list of information messages pertaining to potential issues
+            related to samples or otherwise
 
     Returns:
         dict
