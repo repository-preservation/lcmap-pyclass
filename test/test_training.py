@@ -1,7 +1,7 @@
 import numpy as np
 
 import pyclass
-from pyclass import training, classifier
+from pyclass import training
 
 params = pyclass.app.get_params()
 
@@ -28,50 +28,41 @@ def test_sample():
     assert ans == indices
 
 
-# Temporarily disabled while working through other issues.
-# Will need to build another test data set before turning back on.
-# def test_train_randomforest():
-#     """
-#     Sanity check
-#     """
-#
-#     xfile = r'test/resources/Xs_grid02.npy'
-#     yfile = r'test/resources/Ys_grid02.npy'
-#
-#     xarr = np.load(xfile)
-#     yarr = np.load(yfile)
-#
-#     rmse = xarr[:, :7]
-#     coefs = xarr[:, 7:63]
-#     aspect = xarr[:, 63]
-#     dem = xarr[:, 64]
-#     posidex = xarr[:, 65]
-#     slope = xarr[:, 66]
-#     mpw = xarr[:, 67]
-#     water_prob = xarr[:, 68]
-#     snow_prob = xarr[:, 69]
-#     cloud_prob = xarr[:, 70]
-#
-#     independent = np.hstack((coefs,
-#                              rmse,
-#                              dem[:, np.newaxis],
-#                              aspect[:, np.newaxis],
-#                              slope[:, np.newaxis],
-#                              posidex[:, np.newaxis],
-#                              mpw[:, np.newaxis],
-#                              cloud_prob[:, np.newaxis],
-#                              snow_prob[:, np.newaxis],
-#                              water_prob[:, np.newaxis]))
-#
-#     rs = np.random.RandomState(seed=1)
-#
-#     model = training.train_randomforest(independent, yarr, random_state=rs)
-#
-#     classes, results = classifier.rf_predict(model, independent[0])
-#
-#     assert np.array_equal(classes, np.array([0, 1, 2, 5, 6, 7, 8, 9, 10]))
-#
-#     assert np.array_equal(results, np.array([[0.12, 0, 0.15, 0.02, 0.07,
-#                                               0.37, 0.05, 0.04, 0.18]]))
+def test_train_randomforest():
+    """
+    Sanity check
+    """
+    xfile = r'test/resources/Xs_grid02.npy'
+    yfile = r'test/resources/Ys_grid02.npy'
 
+    xarr = np.load(xfile)
+    yarr = np.load(yfile)
 
+    rmse = xarr[:, :7]
+    coefs = xarr[:, 7:63]
+    aspect = xarr[:, 63]
+    dem = xarr[:, 64]
+    posidex = xarr[:, 65]
+    slope = xarr[:, 66]
+    mpw = xarr[:, 67]
+    water_prob = xarr[:, 68]
+    snow_prob = xarr[:, 69]
+    cloud_prob = xarr[:, 70]
+
+    independent = np.hstack((coefs,
+                             rmse,
+                             dem[:, np.newaxis],
+                             aspect[:, np.newaxis],
+                             slope[:, np.newaxis],
+                             posidex[:, np.newaxis],
+                             mpw[:, np.newaxis],
+                             cloud_prob[:, np.newaxis],
+                             snow_prob[:, np.newaxis],
+                             water_prob[:, np.newaxis]))
+
+    rs = np.random.RandomState(seed=1)
+
+    model, metrics = training.train_randomforest(independent,
+                                                 yarr,
+                                                 params['randomforest'],
+                                                 random_state=rs)

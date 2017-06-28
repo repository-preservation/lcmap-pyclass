@@ -13,32 +13,29 @@ from .version import __name
 log = logging.getLogger(__name__)
 
 
-def __attach_trainmetadata(model, random_seed, metrics, messages):
+def __attach_trainmetadata(model, random_seed, metrics):
     """
     Helper method to attach information and format processing information.
 
     {algorithm: string,
      rf_model: sklearn.ensemble.RandomForestClassifier object,
-     random_state: tuple,
+     random_seed: tuple,
      metrics: string,
      messages: list of strings}
 
     Args:
         model: sklearn random forest object
         random_seed: tuple used to initialize a numpy RandomState object
-        metrics: string of performance metrics of the model during training
+        metrics: string of performance metrics and information of the model
             http://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html
-        messages: list of information messages pertaining to potential issues
-            related to samples or otherwise
 
     Returns:
         dict
     """
     return {'algorithm': algorithm,
             'rf_model': model,
-            'random_state': random_seed,
-            'metrics': metrics,
-            'messages': messages}
+            'random_seed': random_seed,
+            'metrics': metrics}
 
 
 def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=None,
@@ -116,10 +113,12 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=No
 
     # Where we need to get to.
     # TODO makes this configurable
-    model = training.train_randomforest(independent, trends, rfinfo,
-                                        random_state=random_state)
+    model, metrics = training.train_randomforest(independent,
+                                                 trends,
+                                                 rfinfo,
+                                                 random_state=random_state)
 
-    return model, random_seed
+    return __attach_trainmetadata(model, random_seed, metrics)
 
 
 def classify(ccd, dem, aspect, slope, posidex, mpw, quality,

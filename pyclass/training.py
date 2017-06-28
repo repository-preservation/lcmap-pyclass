@@ -2,6 +2,7 @@ import logging
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
 
 from pyclass.app import gen_rng
 
@@ -30,16 +31,28 @@ def class_stats(dependent):
     return class_values, prct
 
 
+def check_sample_counts(dependent, rfinfo):
+    """
+    Helper method to check the incoming dependent data set for potential
+    training issues due to low counts.
+
+    Args:
+        dependent: 1-d ndarray of dependent values
+        rfinfo: dict of random forest related processing parameters
+
+    Returns:
+
+    """
+
+
+
 def sample(dependent, rfinfo, random_state=None):
     """
     Since we have a maximum number of samples that we want to hit
 
     Args:
         dependent: 1-d int ndarray.
-        minimum: minimum number of samples we want of a single class
-            currently doesn't matter with the prescribed methodology
-        maximum: maximum number of samples we want of a single class
-        total: total number of samples we want to hit, across all classes
+        rfinfo: dict of random forest related processing parameters
         random_state: numpy random state object
 
     Returns:
@@ -51,7 +64,7 @@ def sample(dependent, rfinfo, random_state=None):
     class_values, percent = class_stats(dependent)
 
     # Adjust the target counts that we are wanting based on the percentage
-    # that each one represents in the base data set
+    # that each one represents in the base data set.
     adj_counts = np.ceil(rfinfo['target_samples'] * percent)
     adj_counts[adj_counts > rfinfo['class_max']] = rfinfo['class_max']
     adj_counts[adj_counts < rfinfo['class_min']] = rfinfo['class_min']
@@ -83,15 +96,19 @@ def train_randomforest(independent, dependent, rfinfo, random_state=None):
             where each row is a sample and each column is an attribute
         dependent: 1-d ndarray of dependent values, what we are trying to
             predict
-        n_estimators: int. number of trees/estimators for the random forest
+        rfinfo: dict of random forest related processing parameters
         random_state: initialized numpy RandomState class
 
     Returns:
         SKLearn RandomForestClassifier class
     """
+    # Simple list to track issues or other information.
+    msgs = []
+
     # First we need to determine which samples we want to use, based on the
     # distribution of the target/dependant data set.
     indices = sample(dependent, rfinfo, random_state=random_state)
+    log.debug('Indices selected %s', indices)
 
     # Grab the samples that we want from the data sets.
     X = independent[indices]
@@ -103,4 +120,8 @@ def train_randomforest(independent, dependent, rfinfo, random_state=None):
                                      n_estimators=rfinfo['estimators'])
     rfmodel.fit(X, y)
 
-    return rfmodel
+    # Produce some metrics of the fitted model.
+    pred = rfmodel.predict(X)
+    metrics = classification_report(y, pred)
+
+    return rfmodel, metrics
