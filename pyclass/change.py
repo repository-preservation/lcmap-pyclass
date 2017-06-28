@@ -38,6 +38,38 @@ def filter_ccd(ccd, ccdinfo):
     return np.array(coefs), np.array(rmse), np.array(idx)
 
 
+def unpack_ccd(ccd, ccdinfo):
+    """
+    Unpack all the CCD curve fitted information for all the given models. There
+    is no filtering done, all the change model segments are dumped out.
+
+    The returned index array can be used to duplicate array locations in
+    corresponding data sets.
+
+    Args:
+        ccd: pyccd results
+        ccdinfo: dict of CCD related processing parameters
+
+    Returns:
+        2-d ndarray coefficient values
+        2-d ndarray rmse values
+        1-d ndarray index locations
+    """
+    coefs = []
+    rmse = []
+    idx = []
+
+    for i, result in enumerate(ccd):
+        models = unpack_result(result, ccdinfo)
+
+        for model in models:
+            coefs.append(model.coefs)
+            rmse.append(model.rmses)
+            idx.append(i)
+
+    return np.array(coefs), np.array(rmse), np.array(idx)
+
+
 def filter_result(result, ccdinfo):
     """
     Filter a CCD result for a pixel looking for a change model that meets the
@@ -50,20 +82,20 @@ def filter_result(result, ccdinfo):
         1-d ndarray
         1-d ndarray
     """
-    models = unpack_ccd(result, ccdinfo)
+    models = unpack_result(result, ccdinfo)
 
     for model in models:
         if check_coverage(model, ccdinfo['begin_date'], ccdinfo['end_date']):
             return model.coefs, model.rmses
 
 
-def unpack_ccd(ccd, ccdinfo):
+def unpack_result(result, ccdinfo):
     """
     Unpacks the curve fit information for all change models contained in a
     pyccd result.
 
     Args:
-        ccd: pyccd results
+        result: pyccd results
         ccdinfo: dict of CCD related processing parameters
 
     Returns:
@@ -71,7 +103,7 @@ def unpack_ccd(ccd, ccdinfo):
     """
     models = []
 
-    for model in ccd['change_models']:
+    for model in result['change_models']:
         curveinfo = extract_curve(model, ccdinfo)
 
         models.append(ChangeModel(start_day=model['start_day'],

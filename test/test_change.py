@@ -33,11 +33,11 @@ def test_band_list():
     assert np.array_equal(ans, bandls)
 
 
-def test_unpack_ccd():
+def test_unpack_result():
     """
     Make sure each model in a result comes back separately.
     """
-    models = change.unpack_ccd(ccd[0], ccdinfo)
+    models = change.unpack_result(ccd[0], ccdinfo)
 
     assert len(ccd[0]['change_models']) == len(models)
 
@@ -107,11 +107,19 @@ def test_filter_ccd():
     """
     """
     coefs, rmses, idxs = change.filter_ccd(ccd, ccdinfo)
-    print(coefs.shape)
-    print(rmses.shape)
-    print(idxs.shape)
 
     assert coefs.ndim == rmses.ndim == 2
     assert idxs.ndim == 1
     assert coefs.shape[1] == ccdinfo['coef_count'] * len(ccdinfo['bands'])
     assert rmses.shape[1] == len(ccdinfo['bands'])
+    assert idxs.shape[0] == coefs.shape[0] == rmses.shape[0]
+
+
+def test_unpack_ccd():
+    coefs, rmses, idxs = change.unpack_ccd(ccd, ccdinfo)
+
+    assert coefs.ndim == rmses.ndim == 2
+    assert idxs.ndim == 1
+    assert coefs.shape[1] == ccdinfo['coef_count'] * len(ccdinfo['bands'])
+    assert rmses.shape[1] == len(ccdinfo['bands'])
+    assert idxs.shape[0] == coefs.shape[0] == rmses.shape[0]
