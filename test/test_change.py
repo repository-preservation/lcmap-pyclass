@@ -28,7 +28,7 @@ def test_band_list():
     Ensure the list comes back in the correct order.
     """
     ans = ['blue', 'green', 'red', 'nir', 'swir1', 'swir2', 'thermal']
-    bandls = change.band_list(ccdinfo['bands'])
+    bandls = pyclass.app.sorted_list(ccdinfo['bands'])
 
     assert np.array_equal(ans, bandls)
 
