@@ -3,6 +3,8 @@ from collections import namedtuple
 
 import numpy as np
 
+from pyclass import app
+
 ChangeModel = namedtuple('ChangeModel', 'start_day end_day coefs rmses')
 
 log = logging.getLogger(__name__)
@@ -127,7 +129,7 @@ def extract_curve(model, ccdinfo):
         1-d ndarray
         1-d ndarray
     """
-    bands = band_list(ccdinfo['bands'])
+    bands = app.sorted_list(ccdinfo['bands'])
 
     coefs = np.zeros(shape=(len(bands), ccdinfo['coef_count']))
     rmse = np.zeros(shape=(len(bands),))
@@ -153,17 +155,3 @@ def check_coverage(model, begin_ord, end_ord):
         bool
     """
     return (model.start_day <= begin_ord) & (model.end_day >= end_ord)
-
-
-def band_list(bands_dict):
-    """
-    Helper method to take the band dictionary from the parameters, and create
-    a list of the values ordered on the keys.
-
-    Args:
-        bands_dict: dictionary related the order of the band names
-
-    Returns:
-        list
-    """
-    return [bands_dict[k] for k in sorted(bands_dict.keys())]

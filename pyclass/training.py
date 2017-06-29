@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 
-from pyclass.app import gen_rng
+from pyclass import app
 
 
 log = logging.getLogger(__name__)
@@ -31,21 +31,6 @@ def class_stats(dependent):
     return class_values, prct
 
 
-def check_sample_counts(dependent, rfinfo):
-    """
-    Helper method to check the incoming dependent data set for potential
-    training issues due to low counts.
-
-    Args:
-        dependent: 1-d ndarray of dependent values
-        rfinfo: dict of random forest related processing parameters
-
-    Returns:
-
-    """
-
-
-
 def sample(dependent, rfinfo, random_state=None):
     """
     Since we have a maximum number of samples that we want to hit
@@ -58,9 +43,6 @@ def sample(dependent, rfinfo, random_state=None):
     Returns:
         array of index locations to use for training purposes
     """
-    if random_state is None:
-        random_state = gen_rng()
-
     class_values, percent = class_stats(dependent)
 
     # Adjust the target counts that we are wanting based on the percentage
@@ -83,6 +65,21 @@ def sample(dependent, rfinfo, random_state=None):
     return selected_indices
 
 
+def filter_exclusions(dependent, rfinfo):
+    """
+    Filter the incoming dependant array to remove classes that we don't
+    actually train on.
+
+    Args:
+        dependent: 1-d ndarray of ints
+        rfinfo: dict of random forest related processing parameters
+
+    Returns:
+        index locations to use
+    """
+    return ~np.isin(dependent, rfinfo['train_exclude'])
+
+
 def train_randomforest(independent, dependent, rfinfo, random_state=None):
     """
     Train a random forest with a given set independent variables and an
@@ -102,9 +99,6 @@ def train_randomforest(independent, dependent, rfinfo, random_state=None):
     Returns:
         SKLearn RandomForestClassifier class
     """
-    # Simple list to track issues or other information.
-    msgs = []
-
     # First we need to determine which samples we want to use, based on the
     # distribution of the target/dependant data set.
     indices = sample(dependent, rfinfo, random_state=random_state)

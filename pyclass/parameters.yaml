@@ -21,9 +21,20 @@ randomforest:
   class_min: 600
   class_max: 8000
   target_samples: 20000
+  class_labels:
+    0: Insuf. Data
+    1: Developed
+    2: Agriculture
+    3: Grassland/Shrub
+    4: Tree Cover
+    5: Water
+    6: Wetland
+    7: Ice and Snow
+    8: Barren
+    9: Disturbed or Trans.
   train_exclude:
-   - 0
-   - 9
+    - 0
+    - 9
 
 ############################
 # Values related to CCD.

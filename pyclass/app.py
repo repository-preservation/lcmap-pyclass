@@ -45,3 +45,20 @@ def gen_rng():
         Numpy random number generating object
     """
     return np.random.RandomState()
+
+
+def sorted_list(sort_dict):
+    """
+        Helper method to take a dictionary, and create a list of the values
+        ordered on the key values.
+
+        This exists because we cannot guarantee the order in which values in
+        a yaml list stay ordered when going through the python transformation.
+
+        Args:
+            sort_dict: dictionary
+
+        Returns:
+            list
+        """
+    return [sort_dict[k] for k in sorted(sort_dict.keys())]
