@@ -60,7 +60,7 @@ setup(
 
     packages=['pyclass'],
 
-    install_requires=['numpy>=1.10.0',
+    install_requires=['numpy>=1.13.0',
                       'scipy>=0.18.1',
                       'scikit-learn>=0.18',
                       'PyYAML>=3.12'],
