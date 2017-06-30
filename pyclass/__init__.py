@@ -121,7 +121,7 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=No
     return __attach_trainmetadata(model, random_seed, metrics)
 
 
-def classify(ccd, dem, aspect, slope, posidex, mpw, quality,
+def classify(model, ccd, dem, aspect, slope, posidex, mpw, quality,
              proc_params=app.get_params()):
     """
     Main module entry point for classifying a sample or series of samples.
@@ -152,19 +152,15 @@ def classify(ccd, dem, aspect, slope, posidex, mpw, quality,
 
     cloud_prob, snow_prob, water_prob = qa.quality_stats(quality, qainfo)
 
-    coefs, rmse, idx = change.unpack_ccd(ccd, ccdinfo)
-
     # Stack the independent arrays into a single cohesive block.
-    independent = np.hstack((coefs,
-                             rmse,
-                             dem[idx, np.newaxis],
-                             aspect[idx, np.newaxis],
-                             slope[idx, np.newaxis],
-                             posidex[idx, np.newaxis],
-                             mpw[idx, np.newaxis],
-                             cloud_prob[idx, np.newaxis],
-                             snow_prob[idx, np.newaxis],
-                             water_prob[idx, np.newaxis]))
+    aux = np.hstack((dem[:, np.newaxis],
+                     aspect[:, np.newaxis],
+                     slope[:, np.newaxis],
+                     posidex[:, np.newaxis],
+                     mpw[:, np.newaxis],
+                     cloud_prob[:, np.newaxis],
+                     snow_prob[:, np.newaxis],
+                     water_prob[:, np.newaxis]))
 
     # TODO make this configurable
-    return classifier.rf_predict(model, independent)
+    return classifier.classify_ccd(model, ccd, aux, ccdinfo)

@@ -40,8 +40,8 @@ randomforest:
 # Values related to CCD.
 ############################
 ccd:
-  begin_date: 729755
-  end_date: 730850
+  begin_day: 729755
+  end_day: 730850
   coef_count: 8  # includes intercept
   bands: # Ensure order by using a dict instead of a simple list.
     0: blue
