@@ -43,7 +43,8 @@ def sample(dependent, rfinfo, random_state=None):
     Returns:
         array of index locations to use for training purposes
     """
-    class_values, percent = class_stats(dependent)
+    exclude = mask_exclusions(dependent, rfinfo)
+    class_values, percent = class_stats(dependent[~exclude])
 
     # Adjust the target counts that we are wanting based on the percentage
     # that each one represents in the base data set.
@@ -65,19 +66,19 @@ def sample(dependent, rfinfo, random_state=None):
     return selected_indices
 
 
-def filter_exclusions(dependent, rfinfo):
+def mask_exclusions(dependent, rfinfo):
     """
-    Filter the incoming dependant array to remove classes that we don't
-    actually train on.
+    Mask the incoming dependant array to mark classes that we don't
+    actually train on. True being the values to exclude from training.
 
     Args:
         dependent: 1-d ndarray of ints
         rfinfo: dict of random forest related processing parameters
 
     Returns:
-        index locations to use
+        ndarray bool
     """
-    return ~np.isin(dependent, rfinfo['train_exclude'])
+    return np.isin(dependent, rfinfo['train_exclude'])
 
 
 def train_randomforest(independent, dependent, rfinfo, random_state=None):

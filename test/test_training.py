@@ -23,7 +23,7 @@ def test_sample():
 
     indices = training.sample(arr, params['randomforest'], random_state=rng1)
 
-    ans = [10, 5, 20, 0, 15, 1, 11, 21, 16, 6, 12, 17, 7, 22, 2, 18, 3, 8, 13, 23, 19, 4, 9, 14, 24]
+    ans = [11, 6, 21, 1, 16, 2, 12, 22, 17, 7, 13, 18, 8, 23, 3, 19, 4, 9, 14, 24]
 
     assert ans == indices
 
