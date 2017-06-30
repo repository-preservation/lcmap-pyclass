@@ -5,7 +5,7 @@ import logging
 
 import numpy as np
 
-from pyclass import app, stats, training, classifier, change, qa
+from pyclass import app, training, classifier, change, qa
 from .version import __version__
 from .version import __algorithm__ as algorithm
 from .version import __name
