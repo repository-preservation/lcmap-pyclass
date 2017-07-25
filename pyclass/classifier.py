@@ -11,7 +11,6 @@ def result_template():
     return {'start_day': 0,
             'end_day': 0,
             'class_vals': [],
-            # 'class_lbls': [],
             'class_probs': []}
 
 
@@ -36,6 +35,18 @@ def rf_predict(forest, X):
 
 
 def classify_ccd(model, ccd, aux, ccdinfo):
+    """
+    Classify each time segment contained in the pyccd result.
+
+    Args:
+        model: scikit-learn random forest model
+        ccd: pyccd result
+        aux: 1-d ndarray auxillery data set values
+        ccdinfo: ccd related processing parameters
+
+    Returns:
+        list of dicts
+    """
     class_vals = tuple(model.classes_)
     ccd_models = change.unpack_result(ccd, ccdinfo)
 

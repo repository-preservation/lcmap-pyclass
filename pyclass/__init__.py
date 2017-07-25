@@ -39,7 +39,7 @@ def __attach_trainmetadata(model, random_seed, metrics):
 
 
 def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=None,
-          proc_params=app.get_params()):
+          proc_params=None):
     """
     Main module entry point for training a new classification model.
 
@@ -75,6 +75,8 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=No
         quality: 2-d array or list. Observation quality values for the entire
             history of the sample.
         random_seed: tuple used to initialize a numpy RandomState object or None
+        proc_params: python dictionary to change module wide processing
+            parameters
 
 
     Returns:
@@ -122,18 +124,17 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=No
 
 
 def classify(model, ccd, dem, aspect, slope, posidex, mpw, quality,
-             proc_params=app.get_params()):
+             proc_params=None):
     """
     Main module entry point for classifying a sample or series of samples.
+
+    The return is a list of dicts, with each dict corresponding to each
+    time segment in the ccd result.
 
     Args:
         model: Trained classifier model object.
         ccd: 1-d array of dict like structure conforming to the pyccd output
             structure. https://github.com/USGS-EROS/lcmap-pyccd
-        coefs: 2-d array or list. The various coefficients generated from the
-            Continuous Change Detection module.
-        rmse: 2-d array or list. RMSE associated with the models that were
-            generated during the Continuous Change Detection module.
         dem: 1-d array or list. Digital elevation model values.
         aspect: 1-d array or list. DEM derived product.
         slope: 1-d array or list. DEM derived product.
@@ -141,10 +142,11 @@ def classify(model, ccd, dem, aspect, slope, posidex, mpw, quality,
         mpw: 1-d array or list.
         quality: 2-d array or list. Observation quality values for the entire
             history of the sample.
+        proc_params: python dictionary to change module wide processing
+            parameters
 
     Returns:
-        1-d ndarray of ordered class values represented in the model
-        2-d ndarray of the probability for each class within each sample
+        list of dicts
     """
     qainfo = proc_params['qa']
     ccdinfo = proc_params['ccd']
