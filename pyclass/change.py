@@ -29,7 +29,7 @@ def filter_ccd(ccd, ccdinfo):
     rmse = []
     idx = []
 
-    results = [filter_result(r, ccdinfo) for r in ccd]
+    results = [filter_result(r, ccdinfo) if r else None for r in ccd]
 
     for i, res in enumerate(results):
         if res:
