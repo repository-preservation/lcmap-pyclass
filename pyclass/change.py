@@ -87,7 +87,7 @@ def filter_result(result, ccdinfo):
     models = unpack_result(result, ccdinfo)
 
     for model in models:
-        if check_coverage(model, ccdinfo['begin_date'], ccdinfo['end_date']):
+        if check_coverage(model, ccdinfo['begin_day'], ccdinfo['end_day']):
             return model.coefs, model.rmses
 
 

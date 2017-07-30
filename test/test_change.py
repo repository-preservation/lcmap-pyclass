@@ -11,8 +11,8 @@ params = pyclass.app.get_params()
 
 
 ccd = read_ccdresults('test/resources/results.npy')
-ccdinfo = {'begin_date': 729755,
-           'end_date': 730850,
+ccdinfo = {'begin_day': 729755,
+           'end_day': 730850,
            'coef_count': 8,  # includes intercept
            'bands': {0: 'blue',
                      1: 'green',
@@ -47,14 +47,14 @@ def test_check_coverage():
     """
     Model = namedtuple('Model', 'start_day end_day')
 
-    good = Model(start_day=ccdinfo['begin_date'], end_day=ccdinfo['end_date'])
-    bad1 = Model(start_day=ccdinfo['begin_date'] + 1, end_day=ccdinfo['end_date'])
-    bad2 = Model(start_day=ccdinfo['begin_date'], end_day=ccdinfo['end_date'] - 1)
+    good = Model(start_day=ccdinfo['begin_day'], end_day=ccdinfo['end_day'])
+    bad1 = Model(start_day=ccdinfo['begin_day'] + 1, end_day=ccdinfo['end_day'])
+    bad2 = Model(start_day=ccdinfo['begin_day'], end_day=ccdinfo['end_day'] - 1)
 
-    assert change.check_coverage(good, ccdinfo['begin_date'], ccdinfo['end_date'])
+    assert change.check_coverage(good, ccdinfo['begin_day'], ccdinfo['end_day'])
 
-    assert not change.check_coverage(bad1, ccdinfo['begin_date'], ccdinfo['end_date'])
-    assert not change.check_coverage(bad2, ccdinfo['begin_date'], ccdinfo['end_date'])
+    assert not change.check_coverage(bad1, ccdinfo['begin_day'], ccdinfo['end_day'])
+    assert not change.check_coverage(bad2, ccdinfo['begin_day'], ccdinfo['end_day'])
 
 
 def test_filter_result():
