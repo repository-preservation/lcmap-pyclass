@@ -39,7 +39,7 @@ def __attach_trainmetadata(model, random_seed, metrics):
 
 
 def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=None,
-          proc_params=None):
+          proc_params=app.get_params()):
     """
     Main module entry point for training a new classification model.
 
@@ -124,7 +124,7 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=No
 
 
 def classify(model, ccd, dem, aspect, slope, posidex, mpw, quality,
-             proc_params=None):
+             proc_params=app.get_params()):
     """
     Main module entry point for classifying a sample or series of samples.
 
