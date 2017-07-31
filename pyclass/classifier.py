@@ -51,12 +51,12 @@ def classify_ccd(model, ccd, aux, ccdinfo):
     ccd_models = change.unpack_result(ccd, ccdinfo)
 
     ret = []
-    for model in ccd_models:
+    for ccd_model in ccd_models:
         result = result_template()
-        probs = rf_predict(model, np.hstack([model.coefs, model.rmses, aux]))
+        probs = rf_predict(model, np.hstack([ccd_model.coefs, ccd_model.rmses, aux]))
 
-        result['start_day'] = model.start_day
-        result['end_day'] = model.end_day
+        result['start_day'] = ccd_model.start_day
+        result['end_day'] = ccd_model.end_day
         result['class_vals'] = class_vals
         result['class_probs'] = probs
 
