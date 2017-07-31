@@ -155,14 +155,14 @@ def classify(model, ccd, dem, aspect, slope, posidex, mpw, quality,
     cloud_prob, snow_prob, water_prob = qa.quality_stats(quality, qainfo, axis=0)
 
     # Stack the independent arrays into a single cohesive block.
-    aux = np.hstack((dem[:, np.newaxis],
-                     aspect[:, np.newaxis],
-                     slope[:, np.newaxis],
-                     posidex[:, np.newaxis],
-                     mpw[:, np.newaxis],
-                     cloud_prob[:, np.newaxis],
-                     snow_prob[:, np.newaxis],
-                     water_prob[:, np.newaxis]))
+    aux = np.hstack((dem,
+                     aspect,
+                     slope,
+                     posidex,
+                     mpw,
+                     cloud_prob,
+                     snow_prob,
+                     water_prob))
 
     # TODO make this configurable
     return classifier.classify_ccd(model, ccd, aux, ccdinfo)
