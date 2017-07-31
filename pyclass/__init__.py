@@ -152,7 +152,7 @@ def classify(model, ccd, dem, aspect, slope, posidex, mpw, quality,
     ccdinfo = proc_params['ccd']
     rfinfo = proc_params['randomforest']
 
-    cloud_prob, snow_prob, water_prob = qa.quality_stats(quality, qainfo)
+    cloud_prob, snow_prob, water_prob = qa.quality_stats(quality, qainfo, axis=0)
 
     # Stack the independent arrays into a single cohesive block.
     aux = np.hstack((dem[:, np.newaxis],

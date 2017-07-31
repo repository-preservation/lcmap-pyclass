@@ -57,7 +57,7 @@ def check_unbitpack(unpacked, packed, nan):
 
 
 # noinspection PyTypeChecker
-def quality_stats(quality, qainfo):
+def quality_stats(quality, qainfo, axis=1):
     """
     Take the initial quality information for the entire time series, then
     calculate the probabilities for cloud, snow, and water. These outputs are
@@ -74,12 +74,12 @@ def quality_stats(quality, qainfo):
     """
     quality = unpackqa(quality, qainfo)
 
-    total_count = np.sum(quality != qainfo['fill'], axis=1)
+    total_count = np.sum(quality != qainfo['fill'], axis=axis)
     clear_water_count = np.sum((quality == qainfo['clear']) |
-                               (quality == qainfo['water']), axis=1)
-    cloud_count = np.sum(quality == qainfo['cloud'], axis=1)
-    snow_count = np.sum(quality == qainfo['snow'], axis=1)
-    water_count = np.sum(quality == qainfo['water'], axis=1)
+                               (quality == qainfo['water']), axis=axis)
+    cloud_count = np.sum(quality == qainfo['cloud'], axis=axis)
+    snow_count = np.sum(quality == qainfo['snow'], axis=axis)
+    water_count = np.sum(quality == qainfo['water'], axis=axis)
 
     cloud_prob = cloud_count / total_count
     snow_prob = snow_count / (clear_water_count + snow_count + 0.01)
