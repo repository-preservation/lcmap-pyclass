@@ -23,9 +23,9 @@ def test_sample():
 
     indices = training.sample(arr, params['randomforest'], random_state=rng1)
 
-    ans = [11, 6, 21, 1, 16, 2, 12, 22, 17, 7, 13, 18, 8, 23, 3, 19, 4, 9, 14, 24]
+    ans = np.array([11, 6, 21, 1, 16, 2, 12, 22, 17, 7, 13, 18, 8, 23, 3, 19, 4, 9, 14, 24])
 
-    assert ans == indices
+    assert np.array_equal(ans, indices)
 
 
 def test_train_randomforest():
