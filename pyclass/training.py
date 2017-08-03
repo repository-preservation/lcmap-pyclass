@@ -61,7 +61,7 @@ def sample(dependent, rfinfo, random_state=None):
         # Add the index locations up to the count
         selected_indices.extend(indices[:int(count)])
 
-    return selected_indices
+    return np.array(selected_indices)
 
 
 def mask_exclusions(dependent, rfinfo):
@@ -101,20 +101,30 @@ def train_randomforest(independent, dependent, rfinfo, random_state=None):
     # First we need to determine which samples we want to use, based on the
     # distribution of the target/dependant data set.
     indices = sample(dependent, rfinfo, random_state=random_state)
-    log.debug('Indices selected %s', indices)
+    mask = np.zeros_like(dependent, dtype=np.bool)
+    mask[indices] = 1
+    log.debug('Number of samples for training %s' % indices.shape[0])
+    log.debug('Number of samples for testing %s' % (dependent.shape[0] - indices.shape[0]))
 
     # Grab the samples that we want from the data sets.
-    X = independent[indices]
-    y = dependent[indices]
+    train_X = independent[mask]
+    train_y = dependent[mask]
+
+    # Take whatever is leftover and generate some metrics from it.
+    test_X = independent[~mask]
+    test_y = dependent[~mask]
 
     # Initialize the RandomForestClassifier then produce a fit for
     # the data sets.
+    log.debug('Training the Classifier')
     rfmodel = RandomForestClassifier(random_state=random_state,
                                      n_estimators=rfinfo['estimators'])
-    rfmodel.fit(X, y)
+    rfmodel.fit(train_X, train_y)
 
     # Produce some metrics of the fitted model.
-    pred = rfmodel.predict(X)
-    metrics = classification_report(y, pred)
+    log.debug('Creating metrics for %s samples' % test_y.shape[0])
+    pred = rfmodel.predict(test_X)
+    metrics = classification_report(test_y, pred)
+    log.debug('Metrics:\n%s' % metrics)
 
     return rfmodel, metrics
