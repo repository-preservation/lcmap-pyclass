@@ -13,14 +13,14 @@ from .version import __name
 log = logging.getLogger(__name__)
 
 
-def __attach_trainmetadata(model, random_seed, metrics):
+def __attach_trainmetadata(model, random_seed, sample_cts):
     """
     Helper method to attach information and format processing information.
 
     {algorithm: string,
      rf_model: sklearn.ensemble.RandomForestClassifier object,
      random_seed: tuple,
-     metrics: string,
+     sample_cts: string,
      messages: list of strings}
 
     Args:
@@ -35,7 +35,7 @@ def __attach_trainmetadata(model, random_seed, metrics):
     return {'algorithm': algorithm,
             'rf_model': model,
             'random_seed': random_seed,
-            'metrics': metrics}
+            'sample counts': sample_cts}
 
 
 def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=None,
@@ -115,12 +115,12 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=No
 
     # Where we need to get to.
     # TODO makes this configurable
-    model, metrics = training.train_randomforest(independent,
-                                                 trends,
-                                                 rfinfo,
-                                                 random_state=random_state)
+    model, sample_cts = training.train_randomforest(independent,
+                                                    trends,
+                                                    rfinfo,
+                                                    random_state=random_state)
 
-    return __attach_trainmetadata(model, random_seed, metrics)
+    return __attach_trainmetadata(model, random_seed, sample_cts)
 
 
 def classify(model, ccd, dem, aspect, slope, posidex, mpw, quality,

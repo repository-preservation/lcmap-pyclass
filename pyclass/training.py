@@ -110,10 +110,6 @@ def train_randomforest(independent, dependent, rfinfo, random_state=None):
     train_X = independent[mask]
     train_y = dependent[mask]
 
-    # Take whatever is leftover and generate some metrics from it.
-    test_X = independent[~mask]
-    test_y = dependent[~mask]
-
     # Initialize the RandomForestClassifier then produce a fit for
     # the data sets.
     log.debug('Training the Classifier')
@@ -121,10 +117,10 @@ def train_randomforest(independent, dependent, rfinfo, random_state=None):
                                      n_estimators=rfinfo['estimators'])
     rfmodel.fit(train_X, train_y)
 
-    # Produce some metrics of the fitted model.
-    log.debug('Creating metrics for %s samples' % test_y.shape[0])
-    pred = rfmodel.predict(test_X)
-    metrics = classification_report(test_y, pred)
-    log.debug('Metrics:\n%s' % metrics)
+    # Number of samples used for each class.
+    log.debug('Creating sample counts')
+    sample_counts = {}
+    for val in rfmodel.classes_:
+        sample_counts[val] = np.sum(train_y == val)
 
-    return rfmodel, metrics
+    return rfmodel, sample_counts
