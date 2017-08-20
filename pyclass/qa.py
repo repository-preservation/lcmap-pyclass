@@ -23,6 +23,13 @@ def unpackqa(quality, qainfo):
     output = np.ones_like(quality)
     output.fill(qainfo['nan'])
 
+    # We need to first account for special conditions for Landsat 8 pixelQA
+    # inconsistencies.
+    output[((quality & 1 << qainfo['cirrus1']) > 0) &
+           ((quality & 1 << qainfo['cirrus2']) > 0)] = qainfo['clear']
+
+    output[(quality & 1 << qainfo['occlusion']) > 0] = qainfo['clear']
+
     # Reverse hierarchy, values later in the list will overwrite earlier values
     heirarchy = (qainfo['clear'],
                  qainfo['water'],

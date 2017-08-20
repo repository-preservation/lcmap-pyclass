@@ -1,7 +1,8 @@
 ############################
 # Representative values in the QA band.
-# If QA_BITPACKED is true, then the values represent the offsets.
-# QA_NAN is always a straight value, regardless of QA_BITPACKED.
+# If bitpacked is true, then the values represent the offsets.
+# nan is always a straight value, regardless of bitpacked, and is used to
+# make sure that all QA values passed have been accounted for.
 ############################
 qa:
   bitpacked: true
@@ -11,6 +12,9 @@ qa:
   shadow: 3
   snow: 4
   cloud: 5
+  cirrus1: 8
+  cirrus2: 9
+  occlusion: 10
   nan: -1
 
 ############################
