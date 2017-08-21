@@ -38,8 +38,8 @@ def __attach_trainmetadata(model, random_seed, sample_cts):
             'sample counts': sample_cts}
 
 
-def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=None,
-          proc_params=app.get_params()):
+def train(trends, ccd, dem, aspect, slope, posidex, mpw, cloud_prob, snow_prob,
+          water_prob, random_seed=None, proc_params=app.get_params()):
     """
     Main module entry point for training a new classification model.
 
@@ -59,30 +59,24 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=No
         https://docs.scipy.org/doc/numpy/reference/generated/numpy.random.set_state.html
 
     Args:
-        trends: 1-d array or list. Representative values that are trying
+        trends: 1-d ndarray. Representative values that are trying
             to be predicted given other predictors. Dependent variable.
         ccd: 1-d array of dict like structure conforming to the pyccd output
             structure. https://github.com/USGS-EROS/lcmap-pyccd
-        coefs: 2-d array or list. The various coefficients generated from the
-            Continuous Change Detection module.
-        rmse: 2-d array or list. RMSE associated with the models that were
-            generated during the Continuous Change Detection module.
-        dem: 1-d array or list. Digital elevation model values.
-        aspect: 1-d array or list. DEM derived product.
-        slope: 1-d array or list. DEM derived product.
-        posidex: 1-d array or list. DEM derived product.
-        mpw: 1-d array or list.
-        quality: 2-d array or list. Observation quality values for the entire
-            history of the sample.
+        dem: 1-d ndarray. Digital elevation model values.
+        aspect: 1-d ndarray. DEM derived product.
+        slope: 1-d ndarray. DEM derived product.
+        posidex: 1-d ndarray. DEM derived product.
+        mpw: 1-d ndarray. Max potential wetland product.
+        cloud_prob: 1-d ndarray. Probably of cloud from QA.
+        snow_prob: 1-d ndarray. Probably of snow from QA.
+        water_prob: 1-d ndarray. Probably of water from QA.
         random_seed: tuple used to initialize a numpy RandomState object or None
         proc_params: python dictionary to change module wide processing
             parameters
 
-
     Returns:
-        SKLearn RandomForestClassifier object, prediction model
-        tuple used for setting the state of a numpy RandomState object
-
+        dict
     """
     qainfo = proc_params['qa']
     ccdinfo = proc_params['ccd']
@@ -95,9 +89,6 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=No
         random_seed = random_state.get_state()
     else:
         random_state.set_state(random_seed)
-
-    # Turn the QA values into requisite three probabilities
-    cloud_prob, snow_prob, water_prob = qa.quality_stats(quality, qainfo)
 
     coefs, rmse, idx = change.filter_ccd(ccd, ccdinfo)
 
@@ -123,8 +114,8 @@ def train(trends, ccd, dem, aspect, slope, posidex, mpw, quality, random_seed=No
     return __attach_trainmetadata(model, random_seed, sample_cts)
 
 
-def classify(model, ccd, dem, aspect, slope, posidex, mpw, quality,
-             proc_params=app.get_params()):
+def classify(model, ccd, dem, aspect, slope, posidex, mpw, cloud_prob,
+             snow_prob, water_prob, proc_params=app.get_params()):
     """
     Main module entry point for classifying a sample or series of samples.
 
@@ -135,13 +126,14 @@ def classify(model, ccd, dem, aspect, slope, posidex, mpw, quality,
         model: Trained classifier model object.
         ccd: 1-d array of dict like structure conforming to the pyccd output
             structure. https://github.com/USGS-EROS/lcmap-pyccd
-        dem: 1-d array or list. Digital elevation model values.
-        aspect: 1-d array or list. DEM derived product.
-        slope: 1-d array or list. DEM derived product.
-        posidex: 1-d array or list. DEM derived product.
-        mpw: 1-d array or list.
-        quality: 2-d array or list. Observation quality values for the entire
-            history of the sample.
+        dem: 1-d ndarray. Digital elevation model values.
+        aspect: 1-d ndarray. DEM derived product.
+        slope: 1-d ndarray. DEM derived product.
+        posidex: 1-d ndarray. DEM derived product.
+        mpw: 1-d ndarray. Max potential wetland product.
+        cloud_prob: 1-d ndarray. Probably of cloud from QA.
+        snow_prob: 1-d ndarray. Probably of snow from QA.
+        water_prob: 1-d ndarray. Probably of water from QA.
         proc_params: python dictionary to change module wide processing
             parameters
 
@@ -151,8 +143,6 @@ def classify(model, ccd, dem, aspect, slope, posidex, mpw, quality,
     qainfo = proc_params['qa']
     ccdinfo = proc_params['ccd']
     rfinfo = proc_params['randomforest']
-
-    cloud_prob, snow_prob, water_prob = qa.quality_stats(quality, qainfo, axis=0)
 
     # Stack the independent arrays into a single cohesive block.
     aux = np.hstack((dem,
